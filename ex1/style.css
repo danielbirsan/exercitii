@@ -1,0 +1,81 @@
+body {
+    background: linear-gradient(to right, #ffffff, #fff9f9);
+    font-family: Arial, sans-serif;
+
+}
+
+.square {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+
+}
+
+#red-square {
+    top: 100px;
+    left: 100px;
+    background: radial-gradient(circle, red, darkred);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+#blue-square {
+    top: 100px;
+    left: 250px;
+    background: radial-gradient(circle, blue, darkblue);
+    box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+}
+
+
+.circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: absolute;
+    cursor: grab;
+    border: 1px solid black;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background: radial-gradient(circle, white, lightgray);
+    transition: top 0.3s ease, left 0.3s ease;
+
+}
+
+
+
+#blue-circle {
+    top: 250px;
+    left: 275px;
+    background: radial-gradient(circle, blue, darkblue);
+}
+
+#red-circle {
+    top: 250px;
+    left: 125px;
+    background: radial-gradient(circle, red, darkred);
+}
+
+
+nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin: 10px;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+}
