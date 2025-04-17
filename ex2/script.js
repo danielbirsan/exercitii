@@ -1,50 +1,72 @@
-let allData = [];
 const fields = ['A', 'B', 'C'];
 const filterState = Object.fromEntries(fields.map(f => [f, null]));
+const manualFields = new Set();
 const $ = id => document.getElementById(id);
 
+let allData = [];
+
 fetch('testData.txt')
-    .then(res => res.text())
-    .then(text => parseData(text))
-    .catch(() => parseData());
+    .then(r => (r.ok ? r.text() : null))
+    .then(parseData);
 
 function parseData(text) {
-    allData = text
-        ? text.trim().split('\n').map(line => {
-            const [A, B, C] = line.split(',').map(v => v.trim());
+    const defaultTxt = `
+A1,B1,C1
+A1,B1,C2
+A1,B1,C3
+A1,B2,C5
+A2,B5,C9
+A3,B6,C10
+A3,B7,C11`;
+
+    allData = (text || defaultTxt)
+        .trim()
+        .split('\n')
+        .map(l => {
             return { A, B, C };
         })
-        : [
             { A: 'A1', B: 'B1', C: 'C1' },
-            { A: 'A1', B: 'B1', C: 'C2' },
-            { A: 'A1', B: 'B1', C: 'C3' },
-            { A: 'A1', B: 'B2', C: 'C4' },
-            { A: 'A1', B: 'B2', C: 'C5' },
-            { A: 'A1', B: 'B3', C: 'C6' },
-            { A: 'A2', B: 'B4', C: 'C7' },
-            { A: 'A2', B: 'B5', C: 'C8' },
-            { A: 'A2', B: 'B5', C: 'C9' },
-            { A: 'A3', B: 'B6', C: 'C10' }
-        ];
+        });
     init();
+    updateUI();
 }
 
 function init() {
     fields.forEach(f => {
-        $(`select${f}`).addEventListener('change', () => {
-            const val = $(`select${f}`).value;
-            filterState[f] = val === 'Toate' ? null : val;
-            autoResolveFilters(f);
+        $(`select${f}`).addEventListener('change', e => {
+            setFilter(f, e.target.value);
+            autoResolveFilters();
             updateUI();
         });
     });
-    updateUI();
+    autoResolveFilters();
+}
+
+function setFilter(field, val) {
+    if (val === 'Toate') {
+        filterState[field] = null;
+        manualFields.delete(field);
+    } else {
+        filterState[field] = val;
+        manualFields.add(field);
+    }
 }
 
 function getFilteredData() {
-    return allData.filter(row =>
-        fields.every(f => !filterState[f] || row[f] === filterState[f])
+    return allData.filter(r =>
+        fields.every(f => !filterState[f] || r[f] === filterState[f])
     );
+}
+
+function autoResolveFilters() {
+    fields.forEach(f => !manualFields.has(f) && (filterState[f] = null));
+
+    const filtered = getFilteredData();
+    fields.forEach(f => {
+        if (manualFields.has(f)) return;
+        const opts = uniqueValues(filtered, f);
+        filterState[f] = opts.length === 1 ? opts[0] : null;
+    });
 }
 
 function updateUI() {
@@ -52,23 +74,10 @@ function updateUI() {
 
     fields.forEach(f => {
         const sel = $(`select${f}`);
-        const values = [...new Set(filtered.map(r => r[f]))].sort();
-        const isSingle = values.length === 1;
-        const showAll = values.length > 1;
-
-        sel.innerHTML = (showAll ? ['Toate'] : []).concat(values)
-            .map(v => `<option value="${v}">${v}</option>`)
-            .join('');
-
-        if (filterState[f] && values.includes(filterState[f])) {
-            sel.value = filterState[f];
-        } else if (isSingle) {
-            filterState[f] = values[0];
-            sel.value = values[0];
-        } else {
-            filterState[f] = null;
-            sel.value = 'Toate';
-        }
+        const opts = uniqueValues(filtered, f);
+        const list = opts.length > 1 || manualFields.has(f) ? ['Toate', ...opts] : opts;
+        sel.replaceChildren(...list.map(v => new Option(v, v)));
+        sel.value = filterState[f] ?? 'Toate';
     });
 
     $('dataTable').querySelector('tbody').innerHTML = filtered
@@ -76,15 +85,8 @@ function updateUI() {
         .join('');
 }
 
-function autoResolveFilters(changedField) {
-    const remainingFields = fields.filter(f => f !== changedField);
-    let filtered = getFilteredData();
+const uniqueValues = (rs, f) =>
+    [...new Set(rs.map(r => r[f]))].sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true })
+    );
 
-    for (const f of remainingFields) {
-        const options = [...new Set(filtered.map(r => r[f]))];
-        if (options.length === 1) {
-            filterState[f] = options[0];
-            filtered = getFilteredData();
-        }
-    }
-}
