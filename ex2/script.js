@@ -14,7 +14,11 @@ function parseData(text) {
 A1,B1,C1
 A1,B1,C2
 A1,B1,C3
+A1,B2,C4
 A1,B2,C5
+A1,B3,C6
+A2,B4,C7
+A2,B5,C8
 A2,B5,C9
 A3,B6,C10
 A3,B7,C11`;
@@ -23,9 +27,8 @@ A3,B7,C11`;
         .trim()
         .split('\n')
         .map(l => {
+            const [A, B, C] = l.split(',').map(v => v.trim());
             return { A, B, C };
-        })
-            { A: 'A1', B: 'B1', C: 'C1' },
         });
     init();
     updateUI();
