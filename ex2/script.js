@@ -7,7 +7,8 @@ let allData = [];
 
 fetch('testData.txt')
     .then(r => (r.ok ? r.text() : null))
-    .then(parseData);
+    .then(parseData)
+    .catch(() => parseData());
 
 function parseData(text) {
     const defaultTxt = `
