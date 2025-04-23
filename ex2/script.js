@@ -20,8 +20,7 @@ A1,B3,C6
 A2,B4,C7
 A2,B5,C8
 A2,B5,C9
-A3,B6,C10
-A3,B7,C11`;
+A3,B6,C10`;
 
     allData = (text || defaultTxt)
         .trim()
